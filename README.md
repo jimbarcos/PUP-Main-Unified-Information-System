@@ -42,8 +42,6 @@ For bug reports or suggestions, kindly open a ticket on the repository's issue t
 ### Screenshot of the Program:
 ![ui-1](https://github.com/user-attachments/assets/e5cfe51f-806a-45c4-825a-e65964d65983)
 
-![ui-2](https://github.com/user-attachments/assets/a69850b8-f1c3-48a6-a929-fe4822200881)
-
 ![ui-3](https://github.com/user-attachments/assets/5fd8bfc3-5018-4bc7-886b-5250106c4d04)
 
 ![ui-4](https://github.com/user-attachments/assets/294142d2-0e19-484c-8a36-f0c97d455600)
