@@ -1,4 +1,5 @@
 package Classes;
+
 import java.awt.*;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -8,8 +9,8 @@ public class RetrievalForm extends javax.swing.JFrame {
     // Constructor
     public RetrievalForm() {
         initComponents();
-        
-        Image icon = new ImageIcon(this.getClass().getResource("/icon.png")).getImage();
+
+        Image icon = new ImageIcon(getClass().getResource("/icons/image-300x300.jpg")).getImage();
         this.setIconImage(icon);
     }
 
@@ -147,6 +148,11 @@ public class RetrievalForm extends javax.swing.JFrame {
         jCheckBox1.setBorder(null);
         jCheckBox1.setContentAreaFilled(false);
         jCheckBox1.setFocusPainted(false);
+        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox1ActionPerformed(evt);
+            }
+        });
 
         jCheckBox2.setBackground(new java.awt.Color(255, 255, 255));
         jCheckBox2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -154,8 +160,13 @@ public class RetrievalForm extends javax.swing.JFrame {
         jCheckBox2.setText("Show Password");
         jCheckBox2.setContentAreaFilled(false);
         jCheckBox2.setFocusPainted(false);
+        jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox2ActionPerformed(evt);
+            }
+        });
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(136, 0, 0));
         jLabel6.setText(" ");
 
@@ -179,6 +190,11 @@ public class RetrievalForm extends javax.swing.JFrame {
         jPasswordField1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
         jPasswordField2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jPasswordField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jPasswordField2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -300,10 +316,10 @@ public class RetrievalForm extends javax.swing.JFrame {
 
     private void jLabel8MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel8MouseClicked
         int result = JOptionPane.showConfirmDialog(
-        this,
-        "Are you sure you want to exit?",
-        "Exit Confirmation",
-        JOptionPane.YES_NO_OPTION
+                this,
+                "Are you sure you want to exit?",
+                "Exit Confirmation",
+                JOptionPane.YES_NO_OPTION
         );
 
         if (result == JOptionPane.YES_OPTION) {
@@ -320,7 +336,7 @@ public class RetrievalForm extends javax.swing.JFrame {
     private void jLabel8MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel8MouseExited
         jLabel8.setBackground(new Color(255, 255, 255));
         jLabel8.setFont(new Font("Segoe UI", Font.PLAIN, 24));
-        jLabel8.setForeground(new Color(136,0,0));
+        jLabel8.setForeground(new Color(136, 0, 0));
     }//GEN-LAST:event_jLabel8MouseExited
 
     private void jButton1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseEntered
@@ -328,15 +344,81 @@ public class RetrievalForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1MouseEntered
 
     private void jButton1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseExited
-        jButton1.setBackground(new java.awt.Color(136,0,0));
+        jButton1.setBackground(new java.awt.Color(136, 0, 0));
     }//GEN-LAST:event_jButton1MouseExited
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        JOptionPane.showMessageDialog(this, "Account Successfully Created! Redirecting you to the Sign In Page", "Notice", JOptionPane.INFORMATION_MESSAGE);
-        SignIn logFrame = new SignIn();
-        logFrame.pack();
-        logFrame.setVisible(true);  // Display LogIn frame
-        dispose();                  // Close LogIn frame
+        UserFile fData = new UserFile();
+        Logs verify = new Logs();
+
+        verify.setCode(String.valueOf(jPasswordField1.getPassword()));
+        verify.setUsername(jTextField1.getText());
+        verify.setPassword(String.valueOf(jPasswordField2.getPassword()));
+
+        if (!fData.codeExist(verify.getCode())) {
+            jLabel13.setText("*Invalid back-up code");
+        } else {
+            jLabel13.setText("");
+
+            /*remove comment if null exception persist
+            if (null == verify) {
+                return;
+            }*/
+            if (verify.getUsername().isEmpty() && !verify.getPassword().isEmpty()) {
+                jLabel14.setText("*Please enter username");
+                jLabel6.setText("");
+            } else if (!verify.getUsername().isEmpty() && verify.getPassword().isEmpty()) {
+                jLabel14.setText("");
+                jLabel6.setText("*Please enter password");
+            } else if (verify.getUsername().isEmpty() && verify.getPassword().isEmpty()) {
+                jLabel14.setText("*Please enter username");
+                jLabel6.setText("*Please enter password");
+            } else {
+                // Username and password are not empty
+                jLabel14.setText("");
+                jLabel6.setText("");
+
+                // validate username
+                if (fData.isUsernameExist(verify.getUsername())) {
+                    jLabel14.setText("*Username has already been taken");
+                } else if (verify.usernameVerifier(verify.getUsername())) {
+                    jLabel14.setText("*Invalid username");
+                } else {
+                    jLabel14.setText("");
+                    isUsernameValid = true;
+                }
+
+                // password verification
+                switch (verify.passVerifier(verify.getPassword(), verify.getUsername())) {
+                    case 1:
+                        jLabel6.setText("*Please enter password");
+                        break;
+                    case 2:
+                        jLabel6.setText("*Weak password");
+                        break;
+                    default:
+                        isPassValid = true;
+                        jLabel6.setText("");
+                        break;
+                }
+
+                // ang mapapalitan pa lang is yung sa user file
+                if (isPassValid && isUsernameValid) {
+                    // Username and password are not empty
+                    jLabel14.setText("");
+                    jLabel6.setText("");
+
+                    if (fData.codeExist(verify.getCode())) {
+                        fData.updateDate(verify.getCode(), verify.getUsername(), verify.getPassword());
+                        JOptionPane.showMessageDialog(this, "Account Successfully Created! Redirecting you to the Sign In Page", "Notice", JOptionPane.INFORMATION_MESSAGE);
+                        SignIn logFrame = new SignIn();
+                        logFrame.pack();
+                        logFrame.setVisible(true);  // Display LogIn frame
+                        dispose();                  // Close LogIn frame
+                    }
+                }
+            }
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -349,6 +431,26 @@ public class RetrievalForm extends javax.swing.JFrame {
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+        if (jCheckBox1.isSelected()) {
+            jPasswordField1.setEchoChar((char) 0);
+        } else {
+            jPasswordField1.setEchoChar('•');
+        }
+    }//GEN-LAST:event_jCheckBox1ActionPerformed
+
+    private void jCheckBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
+        if (jCheckBox2.isSelected()) {
+            jPasswordField2.setEchoChar((char) 0);
+        } else {
+            jPasswordField2.setEchoChar('•');
+        }
+    }//GEN-LAST:event_jCheckBox2ActionPerformed
+
+    private void jPasswordField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jPasswordField2ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -375,4 +477,7 @@ public class RetrievalForm extends javax.swing.JFrame {
     private javax.swing.JPasswordField jPasswordField2;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
+    private boolean isNameValid;
+    private boolean isUsernameValid;
+    private boolean isPassValid;
 }
